@@ -8,6 +8,20 @@ This library aggregates a stream of domain events by `id`, producing:
 
 The implementation is stream-based, thread-safe, and deduplicates events by `(id, timestamp)`.
 
+## Quick Start
+
+### Prerequisites
+- Java 17+
+- Maven 3.8+
+
+### Clone and run tests
+
+```zsh
+git clone https://github.com/sj1815/data-processing-library.git
+cd data-processing-library
+mvn test
+```
+
 ## Build & Test
 
 ```zsh
