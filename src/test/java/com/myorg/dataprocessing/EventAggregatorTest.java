@@ -8,12 +8,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class EventAggregatorTest {
 
     @Test
+    // Empty input yields no aggregates.
     void aggregate_emptyStream_returnsEmptyMap() {
         Map<String, AggregatedStats> result = EventAggregator.aggregate(Stream.empty());
         assertTrue(result.isEmpty());
     }
 
     @Test
+    // Single event produces a single aggregate with matching stats.
     void aggregate_singleEvent() {
         Event e = new Event("a", 100L, 10.0);
         Map<String, AggregatedStats> result = EventAggregator.aggregate(Stream.of(e));
@@ -27,6 +29,7 @@ class EventAggregatorTest {
     }
 
     @Test
+    // Invalid events are filtered out.
     void aggregate_filtersInvalidEvents() {
         Event bad1 = new Event("a", 1L, -5.0);
         Event bad2 = new Event("a", 2L, Double.NaN);
@@ -42,6 +45,7 @@ class EventAggregatorTest {
     }
 
     @Test
+    // Duplicate (id + timestamp) events are ignored.
     void aggregate_deduplicatesByIdAndTimestamp() {
         Event e1 = new Event("x", 10L, 1.0);
         Event e2 = new Event("x", 10L, 999.0); // duplicate timestamp
@@ -58,6 +62,7 @@ class EventAggregatorTest {
     }
 
     @Test
+    // Out-of-order events still yield correct min/max timestamps.
     void aggregate_handlesOutOfOrderTimestamps() {
         Event e1 = new Event("b", 300L, 2.0);
         Event e2 = new Event("b", 100L, 4.0);
@@ -74,6 +79,7 @@ class EventAggregatorTest {
     }
 
     @Test
+    // Parallel streams are supported safely.
     void aggregate_parallelStream() {
         Stream<Event> events = Stream.of(
                 new Event("p", 1L, 1.0),

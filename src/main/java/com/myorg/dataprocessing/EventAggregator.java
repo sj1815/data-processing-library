@@ -13,6 +13,7 @@ public final class EventAggregator {
 
     private EventAggregator() {}
 
+    // Aggregates a stream of events by id with validation and de-duplication.
     public static Map<String, AggregatedStats> aggregate(Stream<Event> events) {
     var statsById = new ConcurrentHashMap<String, MutableStats>();
     var seenById = new ConcurrentHashMap<String, Set<Long>>();
@@ -43,6 +44,7 @@ public final class EventAggregator {
                 ));
     }
 
+    // Validates an event before processing.
     private static boolean isValid(Event event) {
         if (event == null || event.id() == null || event.id().isBlank()) {
             return false;
@@ -51,6 +53,7 @@ public final class EventAggregator {
         return !Double.isNaN(value) && !Double.isInfinite(value) && value >= 0.0;
     }
 
+    // Thread-safe mutable accumulator for per-id statistics.
     private static final class MutableStats {
     private final LongAdder count = new LongAdder();
     private final DoubleAdder sum = new DoubleAdder();
@@ -59,14 +62,16 @@ public final class EventAggregator {
     private final LongAccumulator max =
         new LongAccumulator(Long::max, Long.MIN_VALUE);
 
-        void add(Event event) {
+    // Incorporates a single event into the running aggregates.
+    void add(Event event) {
             count.increment();
             sum.add(event.value());
             min.accumulate(event.timestamp());
             max.accumulate(event.timestamp());
         }
 
-        AggregatedStats toImmutable() {
+    // Converts the mutable stats to an immutable summary.
+    AggregatedStats toImmutable() {
             long c = count.sum();
             double avg = c == 0 ? 0.0 : sum.sum() / c;
             return new AggregatedStats(c, min.get(), max.get(), avg);
