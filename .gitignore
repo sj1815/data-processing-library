@@ -1,0 +1,15 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# OS files
+.DS_Store
+
+# Logs
+*.log
